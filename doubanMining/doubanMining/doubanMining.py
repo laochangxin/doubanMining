@@ -1,8 +1,8 @@
-﻿import urllib2
-import os
+﻿import logging
 import MovieSpider
 import configure
 import DataAgent
+
 
 def main():
     conf = configure.Configure()

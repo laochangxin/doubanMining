@@ -56,6 +56,14 @@ class MovieSpider(object):
         js_res = json.loads(js_str, 'utf8')
         return js_res
 
+    def parse_movie_homepage(self, movie_id):
+        url = self.conf.MOVIE_HOMEPAGE_URL + movie_id
+        try:
+            content = urllib2.urlopen(url).read()
+        except:
+            print >> sys.stderr, 'error'
+        return
+
     def crawl_movies_data(self, movies_pool):
         return
     

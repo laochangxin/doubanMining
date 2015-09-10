@@ -11,3 +11,4 @@
         self.MOVIE_INFO_PREURL = 'http://movie.douban.com/subject/'
         self.MOVIE_INFO_API = 'http://api.douban.com/v2/movie/subject/'
         self.MOVIE_NOWPLAYING_URL = 'http://movie.douban.com/nowplaying/'
+        self.MOVIE_HOMEPAGE_URL = 'http://movie.douban.com/subject/'
