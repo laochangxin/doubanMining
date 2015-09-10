@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>28eda170-5e51-48b1-b4a5-007f9a840dbc</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MovieSpider.py</StartupFile>
+    <StartupFile>doubanMining.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="configure.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataAgent.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="doubanMining.py" />
     <Compile Include="MovieSpider.py">
       <SubType>Code</SubType>
