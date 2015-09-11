@@ -29,10 +29,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="doubanMining.py" />
-    <Compile Include="MovieSpider.py">
+    <Compile Include="Item\Movie.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MyPymongo.py">
+    <Compile Include="Logger\Logger.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MovieSpider.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="stack\stack\items.py" />
@@ -45,11 +48,15 @@
     <Compile Include="stack\stack\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Logger\" />
+    <Folder Include="Item\" />
     <Folder Include="stack\" />
     <Folder Include="stack\stack\" />
     <Folder Include="stack\stack\spiders\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="logging.json" />
+    <Content Include="Logger\logger.json" />
     <Content Include="stack\scrapy.cfg" />
   </ItemGroup>
   <PropertyGroup>
