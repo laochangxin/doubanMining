@@ -5,6 +5,7 @@ import json
 from bs4 import BeautifulSoup
 import configure
 import logging
+#from Item.Movie import Movie
 
 
 class MovieSpider(object):
@@ -61,6 +62,8 @@ class MovieSpider(object):
         request = urllib2.Request(url)
         movie_eval_foo = lambda a: a.has_attr('property') and a['property'] == 'v:votes'
         movie_type_foo = lambda a: a.has_attr('property') and a['property'] == 'v:genre'
+        movie_release_foo = lambda a: a.has_attr('property') and a['property'] == 'v:initialReleaseDate'
+
         try:
             response = urllib2.urlopen(request)
             content = response.read()
@@ -72,24 +75,65 @@ class MovieSpider(object):
         movie_title = '%s' % soup.h1.span.string
         movie_star = '%s' % soup.strong.string
         movie_eval_num = '%s' % soup.find(movie_eval_foo).string
+        movie_eval_percent_list = self.get_percent_list(soup, movie_id)
         movie_type_list = ['%s' % ele.string for ele in soup.find_all(movie_type_foo)]
-        movie_production_areas = self.get_production_areas(soup)
+        movie_production_areas = self.get_production_areas(soup, movie_id)
+        movie_langs = self.get_movie_lang(soup, movie_id)
+        movie_release_time = '/'.join([ele.string for ele in soup.find_all(movie_release_foo)])
+        movie_tag_list = self.get_tag_list(soup, movie_id)
+        self.logger.info(movie_title)
+        self.logger.info(movie_star)
+        self.logger.info(movie_eval_num)
+        self.logger.info(movie_production_areas)
+        self.logger.info(movie_langs)
+        self.logger.info(movie_release_time)
+        #this_movie = Movie.Movie(movie_title, movie_star, movie_eval_num, movie_production_areas, 
+        #      movie_langs, movie_release_time)
 
-    def get_production_areas(self, soup):
-        foo = lambda a: a.has_attr('id') and a['id'] == 'info'
-        stripped_strings = soup.find(foo).stripped_strings
+    def get_tag_list(self, soup, movie_id):
+        tag_list = soup.find(class_ = 'tags-body').find_all('a')
+        try:
+            return_list = ['%s' % ele.string for ele in tag_list]
+        except Exception, err:
+            self.logger.error('Movie[%s] cannot get tags' % movie_id, exc_info = True)
+        return return_list
+
+    def get_percent_list(self, soup, movie_id):
+        prefix_div_list = soup.find_all(class_ = 'power')
+        return_list = ['%s' % ele.next_sibling.strip()
+                       for ele in prefix_div_list]
+        if return_list == [] or len(return_list) != 5:
+            self.logger.warning('Cannot get movie[%s] percent_list' % movie_id)
+        return return_list
+
+    def get_production_areas(self, soup, movie_id):
         keyword= u'\u5236\u7247\u56fd\u5bb6/\u5730\u533a:' # Chinese: Zhi Pian Guo Jia / Di Qu
-        for x in range(len(stripped_strings) - 2):
-            if stripped_strings[x] == keyword:
-                return stripped_strings[x + 1]
+        foo = lambda a: a.has_attr('id') and a['id'] == 'info'
+        result = soup.find(foo)
+        content_iter = result.contents
+        for x in range(len(content_iter) - 2):
+            if content_iter[x].string == keyword:
+                return content_iter[x + 1].strip()
+        self.logger.warning('Cannot get production[%s] areas' % movie_id)
+        return 'None'
+
+    def get_movie_lang(self, soup, movie_id):
+        keyword = u'\u8bed\u8a00:'
+        foo = lambda a: a.has_attr('id') and a['id'] == 'info'
+        result = soup.find(foo)
+        content_iter = result.contents
+        for x in range(len(content_iter) - 2):
+            if content_iter[x].string == keyword:
+                return content_iter[x + 1].strip()
+        self.logger.warning('Cannot get movie[%s] language' % movie_id)
         return 'None'
 
     def crawl_movies_data(self, movies_pool):
         return
     
-    
 if __name__ == '__main__':
     a_spider = MovieSpider()
+    a_spider.parse_movie_homepage('10727641')
     #a_spider.get_nowplaying_movies('shenzhen')
     #js_res = a_spider.get_movie_info('1292001')
     #print js_res

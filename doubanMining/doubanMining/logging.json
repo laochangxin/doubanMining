@@ -47,16 +47,16 @@
 
   },
 
-    "loggers": {
+  "loggers": {
         "MovieSpider": {
             "level": "INFO",
             "handlers": ["console", "MovieSpider_info_file_handler"],
             "propagate": "no"
         }
-    },
+  },
 
-    "root": {
+  "root": {
         "level": "INFO",
         "handlers": ["console", "info_file_handler", "error_file_handler"]
-    }
+  }
 }
