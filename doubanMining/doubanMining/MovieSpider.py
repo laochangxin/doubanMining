@@ -1,16 +1,20 @@
-﻿import sys
+﻿# -*- coding: utf-8 -*-
+import sys
 import datetime
 import urllib2
 import json
 from bs4 import BeautifulSoup
 import configure
 import logging
-#from Item.Movie import Movie
+import item.Movie
 
 
 class MovieSpider(object):
-    """@brief: Crawl data from douban movie, get movies' info and store in database"""
-    def __init__(self, *args, **kwargs):
+    """
+    @Brief: Crawl data from douban movie, get movies' info and store in database
+    """
+    def __init__(self, id=1):
+        self.spider_id = id
         self.conf = configure.Configure()
         self.logger = logging.getLogger(__name__)
         self.logger.info('Generate a movie spider')
@@ -60,41 +64,56 @@ class MovieSpider(object):
     def parse_movie_homepage(self, movie_id):
         url = self.conf.MOVIE_HOMEPAGE_URL + movie_id
         request = urllib2.Request(url)
-        movie_eval_foo = lambda a: a.has_attr('property') and a['property'] == 'v:votes'
-        movie_type_foo = lambda a: a.has_attr('property') and a['property'] == 'v:genre'
-        movie_release_foo = lambda a: a.has_attr('property') and a['property'] == 'v:initialReleaseDate'
-
         try:
             response = urllib2.urlopen(request)
             content = response.read()
-        except Exception, err:
-            self.logger.error('Parse movie[%s] homepage error[%s]' % (movie_id, err), exc_info=True)
+        except Exception as err:
+            self.logger.error('Request movie[%s] homepage error[%s]' % (movie_id, err), exc_info=True)
             #print >> sys.stderr, 'error'
         soup = BeautifulSoup(content, 'html.parser')
+
         # Note: all data below in UNICODE type
+        # get the movie's title
         movie_title = '%s' % soup.h1.span.string
+        
+        # get the movie's star of comments
         movie_star = '%s' % soup.strong.string
+
+        # get the movie's number of comments
+        movie_eval_foo = lambda a: a.has_attr('property') and a['property'] == 'v:votes'
         movie_eval_num = '%s' % soup.find(movie_eval_foo).string
+
+        # get the movie's display of the comment percent 
         movie_eval_percent_list = self.get_percent_list(soup, movie_id)
+
+        # get the movie's type
+        movie_type_foo = lambda a: a.has_attr('property') and a['property'] == 'v:genre'
         movie_type_list = ['%s' % ele.string for ele in soup.find_all(movie_type_foo)]
+
+        # get the movie's production areas
         movie_production_areas = self.get_production_areas(soup, movie_id)
+        
+        # get the movie's language
         movie_langs = self.get_movie_lang(soup, movie_id)
+
+        # get the movie's release time 
+        movie_release_foo = lambda a: a.has_attr('property') and a['property'] == 'v:initialReleaseDate'
         movie_release_time = '/'.join([ele.string for ele in soup.find_all(movie_release_foo)])
+
+        # get the movie's tags
         movie_tag_list = self.get_tag_list(soup, movie_id)
-        self.logger.info(movie_title)
-        self.logger.info(movie_star)
-        self.logger.info(movie_eval_num)
-        self.logger.info(movie_production_areas)
-        self.logger.info(movie_langs)
-        self.logger.info(movie_release_time)
-        #this_movie = Movie.Movie(movie_title, movie_star, movie_eval_num, movie_production_areas, 
-        #      movie_langs, movie_release_time)
+
+        this_movie = item.Movie.Movie(movie_id, movie_title, movie_star,movie_eval_num,
+                                      movie_eval_percent_list, movie_type_list, movie_production_areas,
+                                      movie_langs, movie_release_time, movie_tag_list)
+        js_dict = this_movie.js_format()
+        this_movie.print_func()
 
     def get_tag_list(self, soup, movie_id):
         tag_list = soup.find(class_ = 'tags-body').find_all('a')
         try:
             return_list = ['%s' % ele.string for ele in tag_list]
-        except Exception, err:
+        except Exception as err:
             self.logger.error('Movie[%s] cannot get tags' % movie_id, exc_info = True)
         return return_list
 

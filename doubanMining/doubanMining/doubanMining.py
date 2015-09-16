@@ -1,4 +1,5 @@
-﻿import os
+﻿# -*- coding: utf-8 -*-
+import os
 import json
 import logging
 import logging.config
@@ -22,7 +23,10 @@ def setup_logging(default_path='logging.json', default_level=logging.INFO, env_k
 def main():
     conf = configure.Configure()
     a_spider = MovieSpider.MovieSpider()
-    a_spider.parse_movie_homepage('10727641')
+    #a_spider.parse_movie_homepage('10727641')
+    #a_spider.parse_movie_homepage('25885212')
+    a_spider.parse_movie_homepage('1291546')
+    
     #movie_list = a_spider.get_nowplaying_movies('shenzhen')
     #js_res = a_spider.get_movie_info('1292001')
     #data_agent = DataAgent.DataAgent()

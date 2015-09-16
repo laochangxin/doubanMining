@@ -12,3 +12,14 @@
         self.MOVIE_INFO_API = 'http://api.douban.com/v2/movie/subject/'
         self.MOVIE_NOWPLAYING_URL = 'http://movie.douban.com/nowplaying/'
         self.MOVIE_HOMEPAGE_URL = 'http://movie.douban.com/subject/'
+
+        self.conf_dict = {
+            'movie': {
+                'url_database': 'url_lib',
+                'url_collection': 'url_movie_collection'
+                },
+            'user': {
+                'url_database': 'url_lib',
+                'url_collection': 'url_user_collection'
+                }
+            }

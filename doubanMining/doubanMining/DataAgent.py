@@ -3,11 +3,16 @@ import pymongo
 import configure
 
 class DataAgent(object):
-    """@brief: responsible of data reading and writing"""
+    """@Brief: responsible of data reading and writing"""
     def __init__(self, *args, **kwargs):
         self.conf = configure.Configure()
         self.client = pymongo.MongoClient(self.conf.host, self.conf.port)
+        self.logger = logging.getLogger(__name__)
+        self.logger.info('Connect to mongoDB[%s:%s]' % (self.conf.host, self.conf.host))
     
+    def __del__(self):
+        self.client.close()
+
     def store_data(self, database_name, collection_name, entity):
         try:
             db = self.client[database_name]

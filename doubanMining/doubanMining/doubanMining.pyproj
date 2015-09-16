@@ -29,13 +29,22 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="doubanMining.py" />
-    <Compile Include="Item\Movie.py">
+    <Compile Include="item\Movie.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="item\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Logger\Logger.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MovieSpider.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="spider\Downloader.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="spider\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="stack\stack\items.py" />
@@ -49,12 +58,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Logger\" />
-    <Folder Include="Item\" />
+    <Folder Include="item\" />
+    <Folder Include="spider\" />
     <Folder Include="stack\" />
     <Folder Include="stack\stack\" />
     <Folder Include="stack\stack\spiders\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="logging - Copy.json" />
     <Content Include="logging.json" />
     <Content Include="Logger\logger.json" />
     <Content Include="stack\scrapy.cfg" />
