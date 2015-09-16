@@ -34,7 +34,7 @@ class Downloader(object):
             self.url_crawled_pool = []
 
     def crawl_url_data(self):
-        """@Brief: Crawl url using BFS"""
+        """@Brief: Crawl url using BFS default"""
         while len(self.url_ready_pool) != 0:
             top_id = self.url_ready_pool.pop(0)
             url = self.conf.MOVIE_HOMEPAGE_URL + top_id
@@ -43,10 +43,10 @@ class Downloader(object):
                 response = urllib2.urlopen(request)
                 content = response.read()
             except Exception as err:
-                self.logger.error('Request movie[%s] homepage error[%s]' % (movie_id, err), exc_info=True)
+                self.logger.error('Request movie[%s] homepage error[%s]' % (top_id, err), exc_info=True)
             #TODO add neighbor movie to the url_crawled_pool
             self.url_crawled_pool.append(content)
-        # random judge
+        # random judges
         self.save_data_into_database()
         
     def download(self):

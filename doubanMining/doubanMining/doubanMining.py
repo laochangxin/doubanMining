@@ -22,6 +22,7 @@ def setup_logging(default_path='logging.json', default_level=logging.INFO, env_k
 
 def main():
     conf = configure.Configure()
+   
     a_spider = MovieSpider.MovieSpider()
     #a_spider.parse_movie_homepage('10727641')
     #a_spider.parse_movie_homepage('25885212')
