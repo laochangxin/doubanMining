@@ -3,9 +3,10 @@ import sys
 import datetime
 import urllib2
 import json
-from bs4 import BeautifulSoup
-import configure
 import logging
+from bs4 import BeautifulSoup
+
+import configure
 import item.Movie
 
 
