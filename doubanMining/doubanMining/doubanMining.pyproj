@@ -6,8 +6,7 @@
     <ProjectGuid>28eda170-5e51-48b1-b4a5-007f9a840dbc</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>doubanMining.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>item\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>doubanMining</Name>
