@@ -43,6 +43,12 @@
     <Compile Include="spider\Downloader.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="spider\ThreadFactory.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="spider\Worker.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="spider\__init__.py">
       <SubType>Code</SubType>
     </Compile>

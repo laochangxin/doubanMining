@@ -3,9 +3,11 @@ import os
 import json
 import logging
 import logging.config
+
 import MovieSpider
 import configure
 import DataAgent
+import spider.Downloader
 
 def setup_logging(default_path='logging.json', default_level=logging.INFO, env_key='LOG_CFG'):
         """Setup logging configuration"""
@@ -23,10 +25,13 @@ def setup_logging(default_path='logging.json', default_level=logging.INFO, env_k
 def main():
     conf = configure.Configure()
    
-    a_spider = MovieSpider.MovieSpider()
+    downloader = spider.Downloader.Downloader()
+    downloader.run()
+
+    #a_spider = MovieSpider.MovieSpider()
     #a_spider.parse_movie_homepage('10727641')
     #a_spider.parse_movie_homepage('25885212')
-    a_spider.parse_movie_homepage('1291546')
+    #a_spider.parse_movie_homepage('1291546')
     
     #movie_list = a_spider.get_nowplaying_movies('shenzhen')
     #js_res = a_spider.get_movie_info('1292001')

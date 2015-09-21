@@ -16,11 +16,11 @@
         """configure for crawler"""
         self.conf_dict = {
             'movie': {
-                'url_database': 'url_lib',
-                'url_collection': 'url_movie_collection'
+                'url_database': 'douban',
+                'url_collection': 'movieid_all_content'
                 },
             'user': {
-                'url_database': 'url_lib',
-                'url_collection': 'url_user_collection'
+                'url_database': 'douban',
+                'url_collection': 'userid_all_content'
                 }
             }

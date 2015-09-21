@@ -1,6 +1,7 @@
 ﻿import sys
 import pymongo
 import configure
+import logging
 
 class DataAgent(object):
     """@Brief: responsible of data reading and writing"""
@@ -27,5 +28,14 @@ class DataAgent(object):
             return -1
         return 0
 
-    def load_data(self, database_name, collection_name):
-        return 0
+    def load_data_id(self, database_name, collection_name):
+        try:
+            id_list = []
+            db = self.client[database_name]
+            collection = db[collection_name]
+            for item in collection.find():
+                id_list.append(item['id'])
+        except Exception as err:
+            self.logger.error('db[%s] collection[%s] load data error[%s]' % (database_name, collection, err), exc_info=True)
+            return -1
+        return id_list        
