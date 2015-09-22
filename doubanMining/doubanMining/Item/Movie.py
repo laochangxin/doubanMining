@@ -39,8 +39,10 @@ class Movie(object):
 
     def print_func(self):
         movie_list = self.js_dict.items()
+        print '========Movie Info========'
         for ele in movie_list:
             print ele[0], ele[1]
+        print '=========================='
 
     def change_list2str(self, input_list):
         return '/'.join(input_list)

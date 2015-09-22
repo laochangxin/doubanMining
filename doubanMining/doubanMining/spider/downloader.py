@@ -37,17 +37,24 @@ class Downloader(object):
         self.db_handler = DataAgent.DataAgent()
         
         self.logger = logging.getLogger(__name__)
-    
+
+    def init_run(self):
+        seed_id_list = self.load_seed_list()
+        neighbor_list = []
+        for id in seed_id_list:
+            cur_neighbor_list = self.get_seed_neighbor(id)
+            neighbor_list += cur_neighbor_list
+            self.visited_set.add(id)
+        self.url_ready_pool = list(set(neighbor_list))
+        if len(self.url_ready_pool) == 0:
+            self.logger.warning('Url ready pool get nothing')
+        for id in self.url_ready_pool:
+            self.request_queue.put((id, 0))
+
     def run(self):
         start_time = datetime.datetime.now()
-        self.url_ready_pool = self.load_seed_list()
-        if len(self.url_ready_pool) == 0:
-            self.logger.warning('Url pool get nothing')
-
-        for ele in self.url_ready_pool:
-            self.request_queue.put((ele, 0))
-        self.logger.debug('Downloader start running, thread number is %s', self.thread_num)
-
+        self.init_run()
+        self.logger.info('Downloader start running, thread number is %s', self.thread_num)
         for x in range(self.thread_num):
             worker = Worker.Worker(self.conf, self.request_queue,
                                  self.visited_set, self.url_crawled_pool)
@@ -62,7 +69,8 @@ class Downloader(object):
                 self.logger.info("Running for %s seconds" % delta.seconds)
                 Worker.Worker.mutex.acquire()
                 buffer2database = copy.deepcopy(self.url_crawled_pool)
-                self.logger.info(','.join([ele[0] for ele in buffer2database]))
+                self.logger.info('%s\t%s' % ('The id list that going to be stored in database',
+                                             ','.join([ele[0] for ele in buffer2database])))
                 while len(self.url_crawled_pool) != 0:
                     self.url_crawled_pool.pop(0)
                 Worker.Worker.mutex.release()
@@ -78,13 +86,24 @@ class Downloader(object):
 
         self.logger.info('Load seed list complete')
         return id_list
-        
+    
+    def get_seed_neighbor(self, seed_id):
+        neighbor_list = []
+        try:
+            neighbor_list = self.db_handler.get_neighbor_list(self.database, self.collection, seed_id)
+        except Exception as err:
+            self.logger.error('Get seed neighbor error[%s]' % err, exc_info=True)
+        return neighbor_list
+
     def save_data_into_database(self, buffer2databse):
         js_dict = {}
         for ele in buffer2databse:
+            if len(ele) != 3:
+                continue
             js_dict['id'] = ele[0]
             js_dict['content'] = ele[1]
-        self.db_handler.store_data(self.database, self.collection, js_dict)
+            js_dict['neighbor_list'] = ele[2]
+            self.db_handler.store_data(self.database, self.collection, js_dict)
 
 if __name__ == '__main__':
     instance = Downloader()

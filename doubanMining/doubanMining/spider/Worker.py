@@ -55,13 +55,23 @@ class Worker(threading.Thread):
         """ Crawl url data from web """
 
         top_id = job_id
-        url = self.conf.MOVIE_HOMEPAGE_URL + top_id
+        entrance = '?from=subject-page'
+        url = '%s%s/%s' % (self.conf.MOVIE_HOMEPAGE_URL, top_id, entrance)
+        #url = self.conf.MOVIE_HOMEPAGE_URL + top_id
         request = urllib2.Request(url)
         try:
             response = urllib2.urlopen(request)
             content = response.read()
         except Exception as err:
-            self.logger.error('Request movie[%s] homepage error[%s]' % (top_id, err), exc_info=True)
+            self.logger.error('Request movie[%s] url[%s] homepage error[%s]' % (top_id, url, err), exc_info=True)
+            err_info = '%s' % err
+            content = {'id': job_id, 'err': err_info}
+            Worker.mutex.acquire()
+            self.visited_set.add(top_id)
+            self.result_queue.append((job_id, content, []))
+            Worker.mutex.release()
+            return
+                
         self.download_page(top_id, content)
 
         neighbor_url_list = self.get_neighbor_url_list(content)
@@ -72,7 +82,7 @@ class Worker(threading.Thread):
                 neighbor_id_list.append(id)
         Worker.mutex.acquire()
         self.visited_set.add(top_id)
-        self.result_queue.append((top_id, content))
+        self.result_queue.append((top_id, content, neighbor_id_list))
         Worker.mutex.release()
         for id in neighbor_id_list:
             self.job_queue.put((id, depth+1))

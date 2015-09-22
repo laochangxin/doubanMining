@@ -38,4 +38,16 @@ class DataAgent(object):
         except Exception as err:
             self.logger.error('db[%s] collection[%s] load data error[%s]' % (database_name, collection, err), exc_info=True)
             return -1
-        return id_list        
+        return id_list
+    
+    def get_neighbor_list(self, database, collection, id):
+        try:
+            neighbor_list = []
+            _db = self.client[database]
+            _collection = _db[collection]
+            for item in _collection.find():
+                neighbor_list = item['neighbor_list']
+        except Exception as err:
+            self.logger.error('db[%s] collection[%s] get neighbor list error[%s]' % (database, collection, err), exc_info=True)
+            return -1
+        return neighbor_list

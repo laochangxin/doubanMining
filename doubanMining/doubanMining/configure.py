@@ -4,7 +4,7 @@
         """database conf"""
         self.host = 'localhost'
         self.port = 27017
-        self.database = 'douban'
+        self.database = 'douban_info'
 
         """movie info"""
         self.movie_collection = 'movie_collection'
@@ -16,11 +16,11 @@
         """configure for crawler"""
         self.conf_dict = {
             'movie': {
-                'url_database': 'douban',
+                'url_database': self.database,
                 'url_collection': 'movieid_all_content'
                 },
             'user': {
-                'url_database': 'douban',
+                'url_database': self.database,
                 'url_collection': 'userid_all_content'
                 }
             }
