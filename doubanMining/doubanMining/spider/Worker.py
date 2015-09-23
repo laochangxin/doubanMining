@@ -39,8 +39,8 @@ class Worker(threading.Thread):
             if self.job_queue.qsize() > 0:
                 job_id, depth = self.job_queue.get()
                 Worker.mutex.acquire()
-                self.logger.info('visited set: %s' % self.visited_set)
-                print ','.join([ele[0] for ele in self.result_queue])
+                #self.logger.info('visited set: %s' % self.visited_set)
+                #print ','.join([ele[0] for ele in self.result_queue])
                 #time.sleep(10)
                 if job_id in self.visited_set:
                     Worker.mutex.release()

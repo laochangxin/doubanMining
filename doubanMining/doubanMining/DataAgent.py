@@ -22,9 +22,10 @@ class DataAgent(object):
             print >> sys.stderr, 'db[%s] collection[%s] load error[%s]' % (database_name, collection_name, err)
             return -1
         try:
-            collection.insert(entity)
+            collection.insert(entity,manipulate=False)
+            #collection.insert(entity)
         except Exception, err:
-            print >> sys.stderr, 'db[%s] collection[%s] write entity[%s] error[%s]' % (database_name, collection_name, entity, err)
+            print >> sys.stderr, 'db[%s] collection[%s] write entity error[%s]' % (database_name, collection_name, err)
             return -1
         return 0
 

@@ -97,12 +97,17 @@ class Downloader(object):
 
     def save_data_into_database(self, buffer2databse):
         js_dict = {}
+        dup_set = set([])
         for ele in buffer2databse:
             if len(ele) != 3:
                 continue
+            if ele[0] in dup_set:
+                continue
+            dup_set.add(ele[0])
             js_dict['id'] = ele[0]
             js_dict['content'] = ele[1]
             js_dict['neighbor_list'] = ele[2]
+            self.logger.info('id: %s' % ele[0])
             self.db_handler.store_data(self.database, self.collection, js_dict)
 
 if __name__ == '__main__':
