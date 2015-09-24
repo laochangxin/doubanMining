@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>28eda170-5e51-48b1-b4a5-007f9a840dbc</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>doubanMining.py</StartupFile>
+    <StartupFile>spider\ProxyCrawler.py</StartupFile>
     <SearchPath>item\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -40,7 +40,13 @@
     <Compile Include="MovieSpider.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="spider\Fetcher.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="spider\Downloader.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="spider\ProxyCrawler.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="spider\ThreadFactory.py">
@@ -70,6 +76,7 @@
     <Folder Include="stack\stack\spiders\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="develop_log.txt" />
     <Content Include="logging - Copy.json" />
     <Content Include="logging.json" />
     <Content Include="Logger\logger.json" />
