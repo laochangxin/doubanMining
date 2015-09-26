@@ -1,19 +1,24 @@
 ﻿import threading
 import time
+import random
 import re
 import logging
 import urllib2
+import httplib
 from bs4 import BeautifulSoup
 
 import configure
+import Fetcher
 
 class Worker(threading.Thread):
     """@Brief: the object that execute tasks"""
     
+    # static variables of Worker
     mutex = threading.Lock()
 
-    def __init__(self, conf_var, job_queue, visited_set, result_queue):
+    def __init__(self, conf_var, proxy_slot, job_queue, visited_set, result_queue):
         self.conf = conf_var
+        self.proxy_slot = proxy_slot
         self.job_queue = job_queue
         self.visited_set = visited_set
         self.result_queue = result_queue
@@ -53,11 +58,31 @@ class Worker(threading.Thread):
 
     def process_job(self, job_id, depth):
         """ Crawl url data from web """
-
         top_id = job_id
         entrance = '?from=subject-page'
         url = '%s%s/%s' % (self.conf.MOVIE_HOMEPAGE_URL, top_id, entrance)
-        #url = self.conf.MOVIE_HOMEPAGE_URL + top_id
+        # Use Class Fetcher to get url content
+        
+        proxy_item = self.choose_a_proxy()
+        fetcher = Fetcher.Fetcher(proxy_item['proxy'])
+        ret_data = fetcher.url_fetch(url)
+        status, reason, content = fetcher.url_fetch(url)
+
+        if status != 200:
+            if status == 404:
+                result = (job_id, '', [], status, reason)
+                Worker.mutex.acquire()
+                self.result_queue.append(result)
+                Worker.mutex.release()
+                return
+            else:
+                retry_num = proxy_item['retry']
+                if retry_num > self.conf.MAX_RETRY_NUM:
+                    Worker.mutex.acquire()
+                    self.proxy_slot.remove(proxy_item)
+                    self.job_queue.put(job_id)
+                proxy_item['retry'] += 1
+
         request = urllib2.Request(url)
         try:
             response = urllib2.urlopen(request)
@@ -87,6 +112,19 @@ class Worker(threading.Thread):
         for id in neighbor_id_list:
             self.job_queue.put((id, depth+1))
     
+    def choose_a_proxy(self):
+        got = False
+        return_proxy = {}
+        while not got:
+            proxy_item = random.choice(self.proxy_slot)
+            if proxy_item['using'] == False:
+                Worker.mutex.acquire()
+                proxy_item['using'] = True
+                return_proxy = proxy_item
+                Worker.mutex.release()
+                got = True
+        return return_proxy
+
     def download_page(self, top_id, content):
         Worker.mutex.acquire()
         f_path = './data/movie/%s.html' % top_id

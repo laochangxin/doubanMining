@@ -37,3 +37,6 @@
                     "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0 ",
                     'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
                     ]
+
+        self.check_url = 'http://movie.douban.com'
+        self.MAX_RETRY_NUM = 3

@@ -4,6 +4,7 @@ import time
 import datetime
 import logging
 import urllib2
+import httplib
 import threading
 import Queue
 from bs4 import BeautifulSoup
@@ -11,6 +12,7 @@ from bs4 import BeautifulSoup
 import configure
 import DataAgent
 import Worker
+import ProxyCrawler
 
 class Downloader(object):
     """@Brief: Download the url from the web.
@@ -20,6 +22,7 @@ class Downloader(object):
     """
     thread_lock = threading.Lock()
     checker_lock = threading.Lock()
+    PROXY_FILE_PATH = './data/valid_proxy.txt'
     
     
     def __init__(self, thread_num=1, seed_list=[], buffer=10000, conf_type='movie'):
@@ -53,10 +56,12 @@ class Downloader(object):
 
     def run(self):
         start_time = datetime.datetime.now()
+        self.load_proxy_slot()
+        self.check_proxy_validation()
         self.init_run()
         self.logger.info('Downloader start running, thread number is %s', self.thread_num)
         for x in range(self.thread_num):
-            worker = Worker.Worker(self.conf, self.request_queue,
+            worker = Worker.Worker(self.conf, self.proxy_slot, self.request_queue,
                                  self.visited_set, self.url_crawled_pool)
             worker.start()
         time.sleep(10)
@@ -86,7 +91,7 @@ class Downloader(object):
 
         self.logger.info('Load seed list complete')
         return id_list
-    
+
     def get_seed_neighbor(self, seed_id):
         neighbor_list = []
         try:
@@ -109,6 +114,41 @@ class Downloader(object):
             js_dict['neighbor_list'] = ele[2]
             self.logger.info('id: %s' % ele[0])
             self.db_handler.store_data(self.database, self.collection, js_dict)
+        
+    def load_proxy_slot(self):
+        self.proxy_slot = []
+        proxy_file = Downloader.PROXY_FILE_PATH
+        if not os.path.exists(proxy_file):
+            proxy_crawler = ProxyCrawler.ProxyCrawler()
+            ret = proxy_crawler.run()
+            if ret != 0:
+                self.logger.warning('Proxy crawler run failed!')
+            proxy_crawler.get_valid_proxy()
+
+        f = open(proxy_file, 'r')
+        for line in open(f):
+            linelist = line.strip().split('=')
+            protocol, proxy = linelist
+            item = {
+                'proxy': proxy,
+                'using': False,
+                'retry': 0
+                }
+            self.proxy_slot.append(item)
+        self.logger.info('Proxy slot count: %d' % len(self.proxy_slot))
+
+    def check_proxy_validation(self):
+        check_url = self.conf.check_url
+        for proxy_item in self.proxy_slot:
+            proxy = proxy_item['proxy']
+            try:
+                conn = httplib.HTTPConnection(proxy, timeout=3.0)
+                conn.request('GET', url)
+                res = conn.getresponse()
+            except Exception as err:
+                self.logger.error('proxy[%s] connection error[%s]' % (proxy, err))
+            self.logger.info('proxy connection status[%s]: %s' % (proxy, res.status, res.reason))
+            
 
 if __name__ == '__main__':
     instance = Downloader()
