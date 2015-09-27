@@ -131,8 +131,7 @@ class Downloader(object):
             protocol, proxy = linelist
             item = {
                 'proxy': proxy,
-                'using': False,
-                'retry': 0
+                'ocupied': False
                 }
             self.proxy_slot.append(item)
         self.logger.info('Proxy slot count: %d' % len(self.proxy_slot))
@@ -148,7 +147,6 @@ class Downloader(object):
             except Exception as err:
                 self.logger.error('proxy[%s] connection error[%s]' % (proxy, err))
             self.logger.info('proxy connection status[%s]: %s' % (proxy, res.status, res.reason))
-            
 
 if __name__ == '__main__':
     instance = Downloader()

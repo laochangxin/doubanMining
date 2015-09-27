@@ -58,46 +58,27 @@ class Worker(threading.Thread):
 
     def process_job(self, job_id, depth):
         """ Crawl url data from web """
-        top_id = job_id
         entrance = '?from=subject-page'
-        url = '%s%s/%s' % (self.conf.MOVIE_HOMEPAGE_URL, top_id, entrance)
-        # Use Class Fetcher to get url content
+        url = '%s%s/%s' % (self.conf.MOVIE_HOMEPAGE_URL, job_id, entrance)
         
+        # Use Class Fetcher to get url content
         proxy_item = self.choose_a_proxy()
         fetcher = Fetcher.Fetcher(proxy_item['proxy'])
         ret_data = fetcher.url_fetch(url)
         status, reason, content = fetcher.url_fetch(url)
+        Worker.mutex.acquire()
+        proxy_item['occupied'] = False
+        Worker.mutex.release()
 
         if status != 200:
-            if status == 404:
-                result = (job_id, '', [], status, reason)
-                Worker.mutex.acquire()
-                self.result_queue.append(result)
-                Worker.mutex.release()
-                return
-            else:
-                retry_num = proxy_item['retry']
-                if retry_num > self.conf.MAX_RETRY_NUM:
-                    Worker.mutex.acquire()
-                    self.proxy_slot.remove(proxy_item)
-                    self.job_queue.put(job_id)
-                proxy_item['retry'] += 1
-
-        request = urllib2.Request(url)
-        try:
-            response = urllib2.urlopen(request)
-            content = response.read()
-        except Exception as err:
-            self.logger.error('Request movie[%s] url[%s] homepage error[%s]' % (top_id, url, err), exc_info=True)
-            err_info = '%s' % err
-            content = {'id': job_id, 'err': err_info}
+            result = (job_id, '', [], status, reason)
             Worker.mutex.acquire()
-            self.visited_set.add(top_id)
-            self.result_queue.append((job_id, content, []))
+            self.visited_set.add(job_id)
+            self.result_queue.append(result)
             Worker.mutex.release()
             return
-                
-        self.download_page(top_id, content)
+        
+        self.download_page(job_id, content)
 
         neighbor_url_list = self.get_neighbor_url_list(content)
         neighbor_id_list = []
@@ -106,33 +87,33 @@ class Worker(threading.Thread):
             if id is not None:
                 neighbor_id_list.append(id)
         Worker.mutex.acquire()
-        self.visited_set.add(top_id)
-        self.result_queue.append((top_id, content, neighbor_id_list))
+        self.visited_set.add(job_id)
+        self.result_queue.append((job_id, content, neighbor_id_list))
         Worker.mutex.release()
         for id in neighbor_id_list:
-            self.job_queue.put((id, depth+1))
-    
+            self.job_queue.put((id, depth+1))                
+            
     def choose_a_proxy(self):
         got = False
         return_proxy = {}
         while not got:
             proxy_item = random.choice(self.proxy_slot)
-            if proxy_item['using'] == False:
+            if proxy_item['ocupied'] == False:
                 Worker.mutex.acquire()
-                proxy_item['using'] = True
+                proxy_item['ocupied'] = True
                 return_proxy = proxy_item
                 Worker.mutex.release()
                 got = True
         return return_proxy
 
-    def download_page(self, top_id, content):
+    def download_page(self, job_id, content):
         Worker.mutex.acquire()
-        f_path = './data/movie/%s.html' % top_id
+        f_path = './data/movie/%s.html' % job_id
         f_handler = open(f_path, 'w')
         try:
             f_handler.write(content)
         except Exception as err:
-            self.logger.error('movie[%s] download failed[%s]' % (top_id, content), exc_info=True)
+            self.logger.error('movie[%s] download failed[%s]' % (job_id, content), exc_info=True)
         finally:
             f_handler.close()
             Worker.mutex.release()
