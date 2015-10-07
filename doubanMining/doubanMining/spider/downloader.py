@@ -1,4 +1,5 @@
-﻿import re
+﻿import os
+import re
 import copy
 import time
 import datetime
@@ -43,12 +44,12 @@ class Downloader(object):
 
     def init_run(self):
         seed_id_list = self.load_seed_list()
-        neighbor_list = []
-        for id in seed_id_list:
-            cur_neighbor_list = self.get_seed_neighbor(id)
-            neighbor_list += cur_neighbor_list
+        neighbor_set = set([])
+        for id, item_list in seed_id_list:
+            for ele in item_list:
+                neighbor_set.add(ele)
             self.visited_set.add(id)
-        self.url_ready_pool = list(set(neighbor_list))
+        self.url_ready_pool = list(neighbor_set)        
         if len(self.url_ready_pool) == 0:
             self.logger.warning('Url ready pool get nothing')
         for id in self.url_ready_pool:
@@ -60,6 +61,7 @@ class Downloader(object):
         self.check_proxy_validation()
         self.init_run()
         self.logger.info('Downloader start running, thread number is %s', self.thread_num)
+        self.logger.info('Downloader start running, request queue: size[%s]', self.request_queue.qsize())
         for x in range(self.thread_num):
             worker = Worker.Worker(self.conf, self.proxy_slot, self.request_queue,
                                  self.visited_set, self.url_crawled_pool)
@@ -76,6 +78,7 @@ class Downloader(object):
                 buffer2database = copy.deepcopy(self.url_crawled_pool)
                 self.logger.info('%s\t%s' % ('The id list that going to be stored in database',
                                              ','.join([ele[0] for ele in buffer2database])))
+                self.logger.info('Request queue: size[%d]' % self.request_queue.qsize())
                 while len(self.url_crawled_pool) != 0:
                     self.url_crawled_pool.pop(0)
                 Worker.Worker.mutex.release()
@@ -101,10 +104,15 @@ class Downloader(object):
         return neighbor_list
 
     def save_data_into_database(self, buffer2databse):
+        if len(buffer2databse) == 0:
+            self.logger.info('Request queue: size[%d]' % (self.request_queue.qsize()))
+            for ele in self.proxy_slot:
+                print ele
+
         js_dict = {}
         dup_set = set([])
         for ele in buffer2databse:
-            if len(ele) != 3:
+            if len(ele) != 5:
                 continue
             if ele[0] in dup_set:
                 continue
@@ -112,41 +120,47 @@ class Downloader(object):
             js_dict['id'] = ele[0]
             js_dict['content'] = ele[1]
             js_dict['neighbor_list'] = ele[2]
+            js_dict['status'] = ele[3]
+            js_dict['reason'] = ele[4]
             self.logger.info('id: %s' % ele[0])
             self.db_handler.store_data(self.database, self.collection, js_dict)
         
     def load_proxy_slot(self):
         self.proxy_slot = []
         proxy_file = Downloader.PROXY_FILE_PATH
-        if not os.path.exists(proxy_file):
-            proxy_crawler = ProxyCrawler.ProxyCrawler()
-            ret = proxy_crawler.run()
-            if ret != 0:
-                self.logger.warning('Proxy crawler run failed!')
-            proxy_crawler.get_valid_proxy()
-
-        f = open(proxy_file, 'r')
-        for line in open(f):
-            linelist = line.strip().split('=')
-            protocol, proxy = linelist
+        #if not os.path.exists(proxy_file):
+        #    proxy_crawler = ProxyCrawler.ProxyCrawler()
+        #    ret = proxy_crawler.run()
+        #    if ret != 0:
+        #        self.logger.warning('Proxy crawler run failed!')
+        #    proxy_crawler.get_valid_proxy()
+        #proxy_crawler = ProxyCrawler.ProxyCrawler()
+        #ret = proxy_crawler.run()
+        #proxy_crawler.get_valid_proxy()
+        for line in open('./data/a.txt', 'r'):
+            proxy = line.strip()
             item = {
                 'proxy': proxy,
-                'ocupied': False
+                'occupied': False
                 }
             self.proxy_slot.append(item)
         self.logger.info('Proxy slot count: %d' % len(self.proxy_slot))
 
     def check_proxy_validation(self):
         check_url = self.conf.check_url
+        check_url = 'http://movie.douban.com/subject/25710912/?from=showing'
         for proxy_item in self.proxy_slot:
             proxy = proxy_item['proxy']
             try:
                 conn = httplib.HTTPConnection(proxy, timeout=3.0)
-                conn.request('GET', url)
+                conn.request('GET', check_url)
                 res = conn.getresponse()
+                self.logger.info('proxy[%s] connection status[%s]: %s' % (proxy, res.status, res.reason))
+                if res.status != 200:
+                    self.proxy_slot.remove(proxy_item)
             except Exception as err:
-                self.logger.error('proxy[%s] connection error[%s]' % (proxy, err))
-            self.logger.info('proxy connection status[%s]: %s' % (proxy, res.status, res.reason))
+                self.logger.error('proxy[%s] connection error[%s]' % (proxy, err), exc_info=True)
+                self.proxy_slot.remove(proxy_item)
 
 if __name__ == '__main__':
     instance = Downloader()

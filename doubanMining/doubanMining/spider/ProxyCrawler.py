@@ -9,7 +9,7 @@ class ProxyCrawler(object):
         of = open('./data/proxy.txt' , 'w')
         user_agent = 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)'
         headers = {'User-Agent': user_agent}
-        for page in range(1, 20):
+        for page in range(1, 160):
             source_url = 'http://www.xici.net.co/nn/%s' % page
             request = urllib2.Request(source_url, headers=headers)
             html_doc = urllib2.urlopen(request).read()
@@ -43,7 +43,7 @@ class ProxyCrawler(object):
     
     
     def ping(self):
-        url = 'http://movie.douban.com'
+        url = 'http://movie.douban.com/subject/25710912/?from=showing'
         while True:
             ProxyCrawler.f_lock.acquire()
             line = ProxyCrawler.reader.readline().strip()

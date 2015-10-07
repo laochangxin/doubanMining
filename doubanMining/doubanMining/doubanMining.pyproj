@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>28eda170-5e51-48b1-b4a5-007f9a840dbc</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>spider\ProxyCrawler.py</StartupFile>
+    <StartupFile>doubanMining.py</StartupFile>
     <SearchPath>item\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -37,7 +37,7 @@
     <Compile Include="Logger\Logger.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MovieSpider.py">
+    <Compile Include="MovieParser.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="spider\Fetcher.py">

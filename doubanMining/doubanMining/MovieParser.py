@@ -10,7 +10,7 @@ import configure
 import item.Movie
 
 
-class MovieSpider(object):
+class MovieParser(object):
     """
     @Brief: Crawl data from douban movie, get movies' info and store in database
     """
@@ -62,15 +62,16 @@ class MovieSpider(object):
         js_res = json.loads(js_str, 'utf8')
         return js_res
 
-    def parse_movie_homepage(self, movie_id):
-        url = self.conf.MOVIE_HOMEPAGE_URL + movie_id
-        request = urllib2.Request(url)
-        try:
-            response = urllib2.urlopen(request)
-            content = response.read()
-        except Exception as err:
-            self.logger.error('Request movie[%s] homepage error[%s]' % (movie_id, err), exc_info=True)
-            #print >> sys.stderr, 'error'
+    def parse_movie_homepage(self, content):
+        #url = self.conf.MOVIE_HOMEPAGE_URL + movie_id
+        #request = urllib2.Request(url)
+        #try:
+        #    response = urllib2.urlopen(request)
+        #    content = response.read()
+        #except Exception as err:
+        #    self.logger.error('Request movie[%s] homepage error[%s]' % (movie_id, err), exc_info=True)
+        #    #print >> sys.stderr, 'error'
+        movie_id = '111'
         soup = BeautifulSoup(content, 'html.parser')
 
         # Note: all data below in UNICODE type

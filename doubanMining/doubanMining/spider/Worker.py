@@ -40,7 +40,12 @@ class Worker(threading.Thread):
             self.run_by_DFS()
         
     def run_by_BFS(self):
+        counter = 0
         while True:
+            counter += 1
+            if counter % 10 == 0:
+                s_time = random.randint(1, 10)
+                time.sleep(s_time)
             if self.job_queue.qsize() > 0:
                 job_id, depth = self.job_queue.get()
                 Worker.mutex.acquire()
@@ -54,6 +59,7 @@ class Worker(threading.Thread):
                     Worker.mutex.release()
                     self.process_job(job_id, depth)
             else:
+                self.logger.info('Thread break loop')
                 break
 
     def process_job(self, job_id, depth):
@@ -63,13 +69,14 @@ class Worker(threading.Thread):
         
         # Use Class Fetcher to get url content
         proxy_item = self.choose_a_proxy()
-        fetcher = Fetcher.Fetcher(proxy_item['proxy'])
+        fetcher = Fetcher.Fetcher(proxy_item['proxy'], compress=False)
         ret_data = fetcher.url_fetch(url)
         status, reason, content = fetcher.url_fetch(url)
+        #self.logger.info('proxy: %s' % proxy_item)
         Worker.mutex.acquire()
         proxy_item['occupied'] = False
         Worker.mutex.release()
-
+        self.logger.info('proxy[%s] status[%s] content_len[%d]' % (proxy_item['proxy'], status, len(content)))
         if status != 200:
             result = (job_id, '', [], status, reason)
             Worker.mutex.acquire()
@@ -88,7 +95,7 @@ class Worker(threading.Thread):
                 neighbor_id_list.append(id)
         Worker.mutex.acquire()
         self.visited_set.add(job_id)
-        self.result_queue.append((job_id, content, neighbor_id_list))
+        self.result_queue.append((job_id, content, neighbor_id_list, status, reason))
         Worker.mutex.release()
         for id in neighbor_id_list:
             self.job_queue.put((id, depth+1))                
@@ -98,9 +105,9 @@ class Worker(threading.Thread):
         return_proxy = {}
         while not got:
             proxy_item = random.choice(self.proxy_slot)
-            if proxy_item['ocupied'] == False:
+            if proxy_item['occupied'] == False:
                 Worker.mutex.acquire()
-                proxy_item['ocupied'] = True
+                proxy_item['occupied'] = True
                 return_proxy = proxy_item
                 Worker.mutex.release()
                 got = True

@@ -34,8 +34,10 @@ class DataAgent(object):
             id_list = []
             db = self.client[database_name]
             collection = db[collection_name]
+            self.logger.info('collection[%s] size[%d]' % (collection_name, collection.count()))
             for item in collection.find():
-                id_list.append(item['id'])
+                id_list.append((item['id'], item['neighbor_list']))
+            print len(id_list)
         except Exception as err:
             self.logger.error('db[%s] collection[%s] load data error[%s]' % (database_name, collection, err), exc_info=True)
             return -1

@@ -1,10 +1,11 @@
 ﻿# -*- coding: utf-8 -*-
 import os
 import json
+import pymongo
 import logging
 import logging.config
 
-import MovieSpider
+import MovieParser
 import configure
 import DataAgent
 import spider.Downloader
@@ -25,8 +26,21 @@ def setup_logging(default_path='logging.json', default_level=logging.INFO, env_k
 def main():
     conf = configure.Configure()
    
-    downloader = spider.Downloader.Downloader()
-    downloader.run()
+    '''download all movies from the web'''
+    #downloader = spider.Downloader.Downloader(thread_num=10)
+    #downloader.run()
+    #downloader.load_proxy_slot()
+
+    '''test MovieParser'''
+    movie_parser = MovieParser.MovieParser()
+    client = pymongo.MongoClient()
+    collection = client.douban_info.movieid_all_content
+    tester = None
+    for ele in collection.find():
+        if ele['status'] == 200:
+            tester = ele['content']
+            res = movie_parser.parse_movie_homepage(tester)
+    
 
     #a_spider = MovieSpider.MovieSpider()
     #a_spider.parse_movie_homepage('10727641')
