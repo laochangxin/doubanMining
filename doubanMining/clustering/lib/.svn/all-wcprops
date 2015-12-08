@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/lib
+END
+libCKMKmeans.a
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/lib/libCKMKmeans.a
+END
+libsvd.a
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/lib/libsvd.a
+END
+libCKMHCLUST.a
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/lib/libCKMHCLUST.a
+END
+libclustering.a
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/lib/libclustering.a
+END
+libCKMSPEC.a
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/lib/libCKMSPEC.a
+END

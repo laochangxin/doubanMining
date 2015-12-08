@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include
+END
+CKMKmeans.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/CKMKmeans.h
+END
+CKMNMF.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/CKMNMF.h
+END
+CKMHCLUST.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/CKMHCLUST.h
+END
+clustering_kmeans.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/clustering_kmeans.h
+END
+clustering_result.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/clustering_result.h
+END
+clustering.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/clustering.h
+END
+clustering_utils.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/clustering_utils.h
+END
+modular_cluster.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/modular_cluster.h
+END
+CKMSPEC.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/CKMSPEC.h
+END
+CKMKmeans_helper.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/lib2-64/!svn/ver/6102/trunk/ml/clustering/include/CKMKmeans_helper.h
+END

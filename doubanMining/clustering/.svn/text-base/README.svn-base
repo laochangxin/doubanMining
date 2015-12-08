@@ -1,0 +1,133 @@
+Example of data format. You may need to follow this format in files specified by --train_data --test_data.
+You can save the content between "------------" in traindata and testdata file.
+Note: data is split by "\t" for each line
+------------------------------------------------------------------------------------------------
+0       薄荷:0.631675   网:0.368325
+1       手表:0.473304   打折:0.363388   网:0.163308
+2       三峡:0.343558   大坝:0.298646   旅游区:0.357796
+3       五彩连珠:1
+4       安徽:0.28725    农学:0.383523   通报:0.329227
+5       09:0.278565     款:0.139283     世嘉:0.582152
+6       辽宁路:1
+7       起凡:0.2767     群雄:0.13969    逐鹿:0.172351   推:0.152757
+------------------------------------------------------------------------------------------------
+
+
+Input paramters:
+--batch           : batch number of each mini batch iteration 
+--iter            : iteration number, usually,
+                  : size(dataset) = epoch * batch * iter, and epoch is usually smaller than 5
+--k               : number of clusters in Kmeans
+--member_file     : output membership filename
+--projection_file : output projection filename
+--train_data      : filename of training data
+--test_data       : filename of testing data
+
+------------------------------------------------------------------------------------------------
+Example 1: Membership results will be wrote to member.file.
+./CKMKmeans_client --batch 10 --iter 100 --k 3 --member_file member.file --train_data traindata --test_data testdata
+
+Example 2: Projection results will be wrote to project.file
+./CKMKmeans_client --batch 10 --iter 100 --k 3 --projection_file member.file --train_data traindata --test_data testdata
+
+Example 3: Membership and projection results will be wrote to member.file and project.file separately.
+./CKMKmeans_client --batch 10 --iter 100 --k 3 --member_file member.file --projection_file project.file --train_data traindata --test_data testdata
+
+Format of membershipfile, given file specified by --test_data(suppose 7 lines), and --k 3, we may have the following output
+--------------------------------------------------------------------------------------------------------
+0	0.3
+1	0.5
+0	0.3
+2	0.1
+0	0.4
+1	0.6
+2	1.2
+--------------------------------------------------------------------------------------------------------
+The first column value is membership, i.e. which cluster current line belongs to.
+The second column value is nearest projection value, i.e. how far is current line from its nearest center. (Euclidean distance)
+
+Format of projection file, given file specified by --test_data(suppose 7 lines), and --k 3, we have:
+--------------------------------------------------------------------------------------------------------
+0.3	0.4	0.5
+0.6	0.5	0.7
+0.3	0.35	0.7
+0.2	0.15	0.1
+0.4	0.5	0.8
+0.7	0.6	0.8
+1.5	1.8	1.2
+--------------------------------------------------------------------------------------------------------
+each line is a data instance, and each column in each line denotes the projection value to corresponding column,
+e.g. in the first line, 0.3	0.4	0.5 means, the first data instance has euclidean distance to center0 of 0.4,
+center1 of 0.5, center2 of 0.5
+
+
+---------------------------------------------Hierachical Clustering Tool-------------------------------------
+tools: CKMHCLUST_client CKMHCLUST_data_info
+Parameters of CKMHCLUST_data_info
+--data           : data filename of your input file
+--sample_pair    : data pairs for evaluating data infomation
+                 : (mean data pair distance, min data pair distance, max data pair distance, median data pair distance)
+
+Parameters of CKMHCLUST_client
+--max_level      : maximum depth of your hierachical cluster tree
+--model_folder   : model folder name
+--split_value    : minimum cohesion to split a cluster(cohesion = mean Euclidean distance between instance and center)
+--train_data     : training data file, data format is the same as CKMKmeans_client
+
+---------------------------------------------running example of CKMHCLUST_data_info----------------------------
+
+./CKMHCLUST_data_info --data query.sim.10w --sample_pair 100000
+
+*************************************************below is log*************************************************
+Your command: 
+--data : query.sim.10w
+--sample_pair : 100000
+Open file: query.sim.10w
+Dataset Info:
+There are 100000 lines
+There are 10083518 non-empty values
+Have read : 99.999000 %
+read data file done.
+Current evaluating process, 100.000000 %
+Data information(sampled): 
+You sampled 100000 data pairs 
+Mean Euclidean distance of sampled data pairs : 450.608
+Max Euclidean distance of sampled data pairs : 573.685
+Min Euclidean distance of sampled data pairs : 120.237
+Median value of Euclidean distance of sampled data pairs : 451.56
+This is a tool for estimating threshold value of CKMHCLUST_client tool
+***************************************************************************************************************
+
+-------------------------------------then you can set split_value smaller than mean distance, say 200----------
+
+./CKMHCLUST_client --max_level 10000 --model_folder folder5 --split_value 200 --train_data query.sim.10w
+
+**********************************************below is log**************************************************** 
+Your command: 
+--train_data : query.sim.10w
+--max_level : 10000
+--split_value : 200
+--model_folder : folder5
+NOTICE: going to remove folder5
+command is: rm -rf folder5
+
+NOTICE: going to create folder folder5
+command is: mkdir folder5
+
+Begin learning hierachical clustering model
+Open file: query.sim.10w
+Dataset Info:
+There are 100000 lines
+There are 10083518 non-empty values
+Have read : 99.999000 %
+read data file done.
+current node depth : 1
+learning progress 100.000000 %
+current node depth : 2
+learning progress 100.000000 %
+current node depth : 2
+learning progress 100.000000 %
+writing node ... mean energy: 197.891279, instance num: 4418
+Writing progress 20.000000 %
+....
+********************************************************************************************************
