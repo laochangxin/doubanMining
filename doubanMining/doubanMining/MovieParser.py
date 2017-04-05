@@ -7,7 +7,7 @@ import logging
 from bs4 import BeautifulSoup
 
 import configure
-import item.Movie
+import Item.Movie
 
 
 class MovieParser(object):
@@ -105,7 +105,7 @@ class MovieParser(object):
         # get the movie's tags
         movie_tag_list = self.get_tag_list(soup, movie_id)
 
-        this_movie = item.Movie.Movie(movie_id, movie_title, movie_star,movie_eval_num,
+        this_movie = Item.Movie.Movie(movie_id, movie_title, movie_star,movie_eval_num,
                                       movie_eval_percent_list, movie_type_list, movie_production_areas,
                                       movie_langs, movie_release_time, movie_tag_list)
         js_dict = this_movie.js_format()
